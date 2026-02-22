@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StudyMind AI">
+<meta name="theme-color" content="#6c63ff">
+<title>StudyMind AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--surf:#12121a;--surf2:#1a1a26;--bdr:#2a2a3d;--acc:#6c63ff;--acc2:#ff6b9d;--acc3:#63ffda;--txt:#e8e8f0;--dim:#7a7a96;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;min-height:100dvh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(108,99,255,.1) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(255,107,157,.07) 0%,transparent 60%);}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);padding:0 1rem;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.logo{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo em{-webkit-text-fill-color:var(--acc3);font-style:normal;}
+.badge{padding:.3rem .75rem;border-radius:999px;font-size:.72rem;font-weight:600;background:rgba(99,255,218,.12);border:1px solid rgba(99,255,218,.3);color:var(--acc3);}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(12,12,20,.97);backdrop-filter:blur(20px);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-around;height:62px;padding:0 .25rem;padding-bottom:env(safe-area-inset-bottom);}
+.bnb{display:flex;flex-direction:column;align-items:center;gap:2px;padding:.4rem .5rem;border-radius:10px;border:none;background:transparent;color:var(--dim);font-size:.58rem;font-weight:600;cursor:pointer;min-width:44px;transition:all .2s;}
+.bnb .bi{font-size:1.15rem;}
+.bnb.active{color:var(--acc);background:rgba(108,99,255,.12);}
+
+/* MORE MENU */
+.more-menu{display:none;position:fixed;bottom:62px;left:0;right:0;background:var(--surf);border-top:1px solid var(--bdr);z-index:199;padding:.6rem;flex-direction:column;gap:.25rem;}
+.more-menu.open{display:flex;}
+.mi{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;border-radius:10px;border:none;background:transparent;color:var(--txt);font-size:.88rem;cursor:pointer;text-align:left;width:100%;font-family:'DM Sans',sans-serif;}
+.mi:active{background:var(--surf2);}
+.mi.active{color:var(--acc);background:rgba(108,99,255,.1);}
+
+/* LAYOUT */
+.app{position:relative;z-index:1;}
+.content{padding:1.1rem;padding-bottom:80px;display:flex;flex-direction:column;gap:1rem;}
+.panel{display:none;}
+.panel.active{display:flex;flex-direction:column;gap:1rem;}
+.ptitle{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;}
+.ptitle span{background:linear-gradient(135deg,var(--acc),var(--acc3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.psub{color:var(--dim);font-size:.83rem;margin-top:.15rem;}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:1.1rem;}
+.ctitle{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--acc);display:inline-block;}
+select{background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.48rem .85rem;outline:none;width:100%;margin-bottom:.75rem;}
+textarea{width:100%;min-height:120px;background:var(--surf2);border:1px solid var(--bdr);border-radius:11px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:.87rem;line-height:1.6;padding:.8rem;resize:vertical;outline:none;-webkit-appearance:none;}
+textarea:focus{border-color:var(--acc);}
+textarea::placeholder{color:var(--dim);}
+.brow{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.75rem;}
+.btn{padding:.58rem 1.15rem;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:600;transition:all .2s;white-space:nowrap;}
+.bp{background:var(--acc);color:#fff;box-shadow:0 4px 14px rgba(108,99,255,.35);flex:1;}
+.bp:active{transform:scale(.98);}
+.bo{background:transparent;color:var(--txt);border:1px solid var(--bdr);}
+.bo:active{background:var(--surf2);}
+.bsm{padding:.36rem .75rem;font-size:.76rem;flex:0;}
+.btn:disabled{opacity:.5;}
+.out{background:var(--surf2);border:1px solid var(--bdr);border-radius:11px;padding:.9rem;font-size:.86rem;line-height:1.75;white-space:pre-wrap;display:none;margin-top:.75rem;}
+.out.vis{display:block;}
+.abar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem;}
+.abtn{display:flex;align-items:center;gap:.35rem;padding:.38rem .75rem;background:var(--surf2);border:1px dashed var(--bdr);border-radius:9px;color:var(--dim);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.abtn:active{border-color:var(--acc);color:var(--acc);}
+.aprev{display:none;align-items:center;gap:.45rem;padding:.35rem .75rem;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);border-radius:9px;font-size:.78rem;}
+.aprev span{color:var(--acc);font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.aprev button{background:none;border:none;color:var(--acc2);cursor:pointer;font-size:.9rem;padding:0;}
+.fc-grid{display:flex;flex-direction:column;gap:.7rem;}
+.fc{background:var(--surf2);border:1px solid var(--bdr);border-radius:13px;padding:1rem;cursor:pointer;position:relative;overflow:hidden;}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--acc2));}
+.fcq{font-weight:600;font-size:.88rem;color:var(--txt);margin-bottom:.3rem;}
+.fca{font-size:.84rem;color:var(--dim);line-height:1.5;display:none;margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--bdr);}
+.fc.rev .fca{display:block;}
+.fc.rev .fcq{color:var(--acc);}
+.fch{font-size:.68rem;color:var(--dim);margin-top:.5rem;opacity:.5;}
+.qq{background:var(--surf2);border:1px solid var(--bdr);border-radius:13px;padding:1.1rem;margin-bottom:.7rem;}
+.qqt{font-weight:600;margin-bottom:.75rem;font-size:.88rem;line-height:1.5;}
+.qopts{display:flex;flex-direction:column;gap:.4rem;}
+.qo{padding:.6rem .9rem;border-radius:9px;border:1px solid var(--bdr);background:transparent;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer;text-align:left;width:100;transition:all .2s;}
+.qo:active:not(:disabled){background:rgba(108,99,255,.07);}
+.qo.ok{border-color:var(--acc3)!important;background:rgba(99,255,218,.1)!important;color:var(--acc3)!important;}
+.qo.ng{border-color:var(--acc2)!important;background:rgba(255,107,157,.1)!important;color:var(--acc2)!important;}
+.qfb{margin-top:.55rem;font-size:.8rem;color:var(--dim);font-style:italic;line-height:1.4;}
+.pd{background:var(--surf2);border:1px solid var(--bdr);border-left:3px solid var(--acc);border-radius:11px;padding:.8rem 1rem;margin-bottom:.6rem;}
+.pdt{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:var(--acc);margin-bottom:.3rem;}
+.pdc{font-size:.83rem;line-height:1.65;color:var(--dim);}
+.chat-wrap{display:flex;flex-direction:column;height:calc(100dvh - 180px);min-height:300px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.75rem;background:var(--surf2);border-radius:13px;border:1px solid var(--bdr);margin-bottom:.6rem;min-height:0;-webkit-overflow-scrolling:touch;}
+.msg{display:flex;gap:.55rem;align-items:flex-start;animation:mi .2s ease;}
+@keyframes mi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.mav{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;margin-top:2px;}
+.msg.user .mav{background:rgba(108,99,255,.2);}
+.msg.ai .mav{background:rgba(99,255,218,.14);}
+.mb{background:var(--surf);border:1px solid var(--bdr);border-radius:11px;padding:.6rem .85rem;font-size:.84rem;line-height:1.65;max-width:88%;white-space:pre-wrap;}
+.msg.user .mb{background:rgba(108,99,255,.12);border-color:rgba(108,99,255,.25);}
+.ci-row{display:flex;gap:.5rem;flex-shrink:0;}
+.ci{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:11px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:.87rem;padding:.6rem .85rem;outline:none;resize:none;min-height:44px;max-height:100px;-webkit-appearance:none;}
+.ci:focus{border-color:var(--acc);}
+.send-btn{align-self:flex-end;height:44px;padding:0 1rem;background:var(--acc);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;flex-shrink:0;}
+.loader{display:inline-flex;gap:4px;align-items:center;padding:.2rem 0;}
+.loader span{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:bo 1.2s infinite;}
+.loader span:nth-child(2){animation-delay:.2s;background:var(--acc2);}
+.loader span:nth-child(3){animation-delay:.4s;background:var(--acc3);}
+@keyframes bo{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+.sbadge{display:inline-flex;align-items:center;background:rgba(99,255,218,.11);border:1px solid rgba(99,255,218,.28);color:var(--acc3);padding:.32rem .8rem;border-radius:999px;font-size:.8rem;font-weight:600;}
+.toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:var(--surf);border:1px solid var(--bdr);border-left:3px solid var(--acc3);border-radius:11px;padding:.65rem 1rem;font-size:.82rem;z-index:999;animation:ti .3s ease;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;}
+@keyframes ti{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.upzone{border:2px dashed var(--bdr);border-radius:13px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--surf2);}
+.upzone:active{border-color:var(--acc);}
+.rec-btn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.25rem;background:var(--acc);color:#fff;box-shadow:0 4px 16px rgba(108,99,255,.38);}
+.rec-btn.rec{background:var(--acc2);animation:rp 1.5s infinite;}
+@keyframes rp{0%,100%{transform:scale(1)}50%{transform:scale(1.08);}}
+.rstat{display:none;align-items:center;gap:.6rem;padding:.55rem .8rem;background:rgba(255,107,157,.09);border:1px solid rgba(255,107,157,.22);border-radius:9px;font-size:.81rem;color:var(--acc2);margin-top:.75rem;}
+.rstat.on{display:flex;}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Study<em>Mind</em> AI</div>
+  <div class="badge">⚡ Groq AI</div>
+</header>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="bnb active" onclick="go('record')" id="bnav-record"><span class="bi">🎙️</span>Record</button>
+  <button class="bnb" onclick="go('summary')" id="bnav-summary"><span class="bi">✨</span>Summary</button>
+  <button class="bnb" onclick="go('chat')" id="bnav-chat"><span class="bi">💬</span>Chat</button>
+  <button class="bnb" onclick="go('flash')" id="bnav-flash"><span class="bi">🃏</span>Cards</button>
+  <button class="bnb" onclick="toggleMore()" id="bnav-more"><span class="bi">⋯</span>More</button>
+</div>
+
+<!-- MORE MENU -->
+<div class="more-menu" id="moreMenu">
+  <button class="mi" onclick="go('notes')">📝 Notes</button>
+  <button class="mi" onclick="go('upload')">📄 Upload Document</button>
+  <button class="mi" onclick="go('quiz')">🎯 Quiz</button>
+  <button class="mi" onclick="go('plan')">📅 Study Plan</button>
+</div>
+
+<div class="app">
+<div class="content">
+
+  <!-- RECORD -->
+  <div class="panel active" id="panel-record">
+    <div><div class="ptitle">🎙️ Record <span>Class Audio</span></div><div class="psub">Live transcription of your teacher.</div></div>
+    <div class="card">
+      <div class="ctitle"><span class="dot"></span>Voice Recorder</div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <button class="rec-btn" id="recBtn" onclick="toggleRec()">🎙️</button>
+        <div>
+          <div style="font-weight:600;margin-bottom:.15rem;" id="recStat">Tap to start recording</div>
+          <div style="font-size:.78rem;color:var(--dim);" id="recTime">0:00</div>
+        </div>
+      </div>
+      <div class="rstat" id="rstat"><span>🔴</span>Recording — speak clearly.</div>
+      <div id="trOut" class="out" style="max-height:180px;overflow-y:auto;"></div>
+      <div class="brow" style="display:none;" id="recAct">
+        <button class="btn bp" onclick="useAll('tr');go('summary');doSummary()">Analyze</button>
+        <button class="btn bo bsm" onclick="useAll('tr')">Use All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="panel" id="panel-notes">
+    <div><div class="ptitle">📝 <span>Notes</span></div><div class="psub">Paste your class notes here.</div></div>
+    <div class="card">
+      <textarea id="notesIn" placeholder="Paste your notes here..." style="min-height:200px;"></textarea>
+      <div class="brow">
+        <button class="btn bp" onclick="useAll('notes');go('summary');doSummary()">Analyze</button>
+        <button class="btn bo bsm" onclick="useAll('notes')">Use All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="panel" id="panel-upload">
+    <div><div class="ptitle">📄 <span>Upload</span></div><div class="psub">Upload PDF, DOCX or TXT.</div></div>
+    <div class="card">
+      <div class="upzone" onclick="document.getElementById('fi').click()">
+        <div style="font-size:1.8rem;margin-bottom:.4rem;">📂</div>
+        <p style="font-weight:600;">Tap to upload file</p>
+        <p style="font-size:.78rem;color:var(--dim);margin-top:.25rem;">PDF, DOCX, TXT</p>
+      </div>
+      <input type="file" id="fi" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="pickFile(event)">
+      <div id="finfo" style="display:none;margin-top:.75rem;padding:.55rem .8rem;background:rgba(108,99,255,.07);border-radius:9px;font-size:.83rem;border:1px solid rgba(108,99,255,.18);"></div>
+      <div id="upOut" class="out" style="max-height:150px;overflow-y:auto;"></div>
+      <div class="brow" style="display:none;" id="upAct">
+        <button class="btn bp" onclick="useAll('up');go('summary');doSummary()">Analyze</button>
+        <button class="btn bo bsm" onclick="useAll('up')">Use All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="panel" id="panel-summary">
+    <div><div class="ptitle">✨ AI <span>Summary</span></div><div class="psub">Clear summary of your content.</div></div>
+    <div class="card">
+      <div class="abar">
+        <button class="abtn" onclick="document.getElementById('sumFile').click()">📎 Attach File</button>
+        <input type="file" id="sumFile" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="tabAttach(event,'sumIn','sum')">
+        <div class="aprev" id="aprev-sum">📄 <span id="aname-sum"></span><button onclick="removeAttach('sum','sumIn')">✕</button></div>
+      </div>
+      <textarea id="sumIn" placeholder="Paste content or attach a file..."></textarea>
+      <div class="brow">
+        <button class="btn bp" onclick="doSummary()">Generate Summary</button>
+        <button class="btn bo bsm" onclick="document.getElementById('sumIn').value=''">Clear</button>
+      </div>
+    </div>
+    <div class="card" id="sumCard" style="display:none;">
+      <div class="ctitle"><span class="dot" style="background:var(--acc3)"></span>Summary</div>
+      <div id="sumOut" class="out vis"></div>
+      <div class="brow"><button class="btn bo bsm" onclick="cpEl('sumOut')">Copy</button></div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="panel" id="panel-flash">
+    <div><div class="ptitle">🃏 <span>Flashcards</span></div><div class="psub">Tap a card to reveal the answer.</div></div>
+    <div class="card">
+      <div class="abar">
+        <button class="abtn" onclick="document.getElementById('flFile').click()">📎 Attach File</button>
+        <input type="file" id="flFile" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="tabAttach(event,'flIn','fl')">
+        <div class="aprev" id="aprev-fl">📄 <span id="aname-fl"></span><button onclick="removeAttach('fl','flIn')">✕</button></div>
+      </div>
+      <textarea id="flIn" placeholder="Paste content or attach a file..." style="min-height:90px;"></textarea>
+      <div class="brow"><button class="btn bp" onclick="doFlash()">Generate Flashcards</button></div>
+    </div>
+    <div id="flSec" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;" id="flCount"></div>
+        <button class="btn bo bsm" onclick="revAll()">Reveal All</button>
+      </div>
+      <div class="fc-grid" id="flGrid"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="panel" id="panel-quiz">
+    <div><div class="ptitle">🎯 AI <span>Quiz</span></div><div class="psub">Test your knowledge.</div></div>
+    <div class="card">
+      <div class="abar">
+        <button class="abtn" onclick="document.getElementById('qzFile').click()">📎 Attach File</button>
+        <input type="file" id="qzFile" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="tabAttach(event,'qzIn','qz')">
+        <div class="aprev" id="aprev-qz">📄 <span id="aname-qz"></span><button onclick="removeAttach('qz','qzIn')">✕</button></div>
+      </div>
+      <textarea id="qzIn" placeholder="Paste content or attach a file..." style="min-height:90px;"></textarea>
+      <div class="brow"><button class="btn bp" onclick="doQuiz()">Generate Quiz</button></div>
+    </div>
+    <div id="qzSec" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;">Quiz</div>
+        <div class="sbadge" id="qscore" style="display:none;">0/0</div>
+      </div>
+      <div id="qzCon"></div>
+      <div id="qzRes" style="display:none;padding:1rem;background:rgba(99,255,218,.07);border:1px solid rgba(99,255,218,.19);border-radius:13px;text-align:center;margin-top:.75rem;">
+        <div style="font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:.4rem;" id="qzResT"></div>
+        <button class="btn bp" onclick="retryQuiz()" style="margin-top:.35rem;">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="panel" id="panel-plan">
+    <div><div class="ptitle">📅 Study <span>Plan</span></div><div class="psub">Day-by-day study schedule.</div></div>
+    <div class="card">
+      <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem;">
+        <span style="font-size:.78rem;color:var(--dim);">Days:</span>
+        <select id="pd" style="width:auto;margin-bottom:0;"><option value="3">3 days</option><option value="5" selected>5 days</option><option value="7">7 days</option><option value="14">2 weeks</option></select>
+      </div>
+      <div class="abar">
+        <button class="abtn" onclick="document.getElementById('plFile').click()">📎 Attach File</button>
+        <input type="file" id="plFile" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="tabAttach(event,'plIn','pl')">
+        <div class="aprev" id="aprev-pl">📄 <span id="aname-pl"></span><button onclick="removeAttach('pl','plIn')">✕</button></div>
+      </div>
+      <textarea id="plIn" placeholder="Paste content or attach a file..." style="min-height:90px;"></textarea>
+      <div class="brow"><button class="btn bp" onclick="doPlan()">Generate Plan</button></div>
+    </div>
+    <div id="plSec" style="display:none;">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:.75rem;" id="plTitle"></div>
+      <div id="plCon"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="panel" id="panel-chat">
+    <div><div class="ptitle">💬 AI <span>Tutor</span></div><div class="psub">Ask anything — attach files to discuss them.</div></div>
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chatMsgs">
+        <div class="msg ai"><div class="mav">🤖</div><div class="mb">Hi! I am your AI study tutor. Ask me anything or attach a file!</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;flex-shrink:0;">
+        <div class="abar" style="margin-bottom:0;">
+          <button class="abtn" onclick="document.getElementById('chatFile').click()">📎 Attach</button>
+          <input type="file" id="chatFile" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="chatAttach(event)">
+          <div class="aprev" id="chatAprev">📄 <span id="chatAname"></span><button onclick="removeChatAttach()">✕</button></div>
+        </div>
+        <div class="ci-row">
+          <textarea class="ci" id="chatIn" placeholder="Ask a question..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();doChat()}"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+          <button class="send-btn" id="cSend" onclick="doChat()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// API endpoint - calls our Vercel serverless function
+const API = '/api/ai';
+let trText='',isRec=false,recObj=null,recTimer=null,recSecs=0;
+let qAns=0,qOk=0,qTot=0,lastQContent='',lastQModel='';
+let chatAText='',chatAName='';
+const chatHist=[];
+
+// ── NAVIGATION ──
+function go(p){
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.bnb').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.mi').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+p).classList.add('active');
+  const btn=document.getElementById('bnav-'+p);
+  if(btn) btn.classList.add('active');
+  else document.getElementById('bnav-more').classList.add('active');
+  document.getElementById('moreMenu').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleMore(){document.getElementById('moreMenu').classList.toggle('open');}
+document.addEventListener('click',e=>{const m=document.getElementById('moreMenu');if(m.classList.contains('open')&&!e.target.closest('.more-menu')&&!e.target.closest('#bnav-more'))m.classList.remove('open');});
+
+// ── CALL AI (via Vercel API) ──
+async function callAI(prompt){
+  const r=await fetch(API,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt})
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.error||'API error '+r.status);}
+  const d=await r.json();
+  return d.response||'';
+}
+
+// Streaming for chat
+async function callAIStream(messages, onTok){
+  const r=await fetch(API,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt: messages.map(m=>m.role.toUpperCase()+': '+m.content).join('\n\n'), stream:false})
+  });
+  if(!r.ok) throw new Error('API error '+r.status);
+  const d=await r.json();
+  const text=d.response||'';
+  onTok(text);
+  return text;
+}
+
+// ── USE FOR ALL ──
+function useAll(src){
+  let t='';
+  if(src==='notes') t=document.getElementById('notesIn').value.trim();
+  else if(src==='up') t=document.getElementById('upOut').textContent.trim();
+  else if(src==='tr') t=trText;
+  if(!t){toast('No content!',1);return;}
+  ['sumIn','flIn','qzIn','plIn'].forEach(id=>document.getElementById(id).value=t);
+  toast('Loaded into all tools');
+}
+
+// ── RECORDING ──
+function toggleRec(){isRec?stopRec():startRec();}
+function startRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Use Chrome for recording',1);return;}
+  recObj=new SR();recObj.continuous=true;recObj.interimResults=true;recObj.lang='en-US';
+  trText='';
+  const out=document.getElementById('trOut');out.classList.add('vis');out.textContent='';
+  recObj.onresult=e=>{let f='',i='';for(let x=e.resultIndex;x<e.results.length;x++){if(e.results[x].isFinal)f+=e.results[x][0].transcript+' ';else i+=e.results[x][0].transcript;}if(f)trText+=f;out.textContent=trText+(i?'...'+i:'');};
+  recObj.onerror=e=>{toast('Mic error: '+e.error,1);stopRec();};
+  recObj.start();isRec=true;recSecs=0;
+  document.getElementById('recBtn').classList.add('rec');
+  document.getElementById('recBtn').textContent='⏹️';
+  document.getElementById('recStat').textContent='Recording...';
+  document.getElementById('rstat').classList.add('on');
+  recTimer=setInterval(()=>{recSecs++;document.getElementById('recTime').textContent=Math.floor(recSecs/60)+':'+String(recSecs%60).padStart(2,'0');},1000);
+}
+function stopRec(){
+  if(recObj)recObj.stop();isRec=false;clearInterval(recTimer);
+  document.getElementById('recBtn').classList.remove('rec');document.getElementById('recBtn').textContent='🎙️';
+  document.getElementById('recStat').textContent='Done';document.getElementById('rstat').classList.remove('on');
+  if(trText){document.getElementById('recAct').style.display='flex';toast('Recording done!');}
+}
+
+// ── FILE READING ──
+async function readFile(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='txt') return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsText(file);});
+  if(ext==='pdf'){
+    if(!window.pdfjsLib){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';document.head.appendChild(s);await new Promise(res=>s.onload=res);pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
+    const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    let t='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();t+=c.items.map(x=>x.str).join(' ')+'\n';}
+    return t;
+  }
+  if(ext==='docx'||ext==='doc'){
+    if(!window.mammoth){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';document.head.appendChild(s);await new Promise(res=>s.onload=res);}
+    const buf=await file.arrayBuffer();const res=await mammoth.extractRawText({arrayBuffer:buf});return res.value;
+  }
+  throw new Error('Use PDF, DOCX or TXT');
+}
+
+function pickFile(e){handleUpload(e.target.files[0]);e.target.value='';}
+async function handleUpload(file){
+  if(!file)return;
+  document.getElementById('finfo').style.display='block';
+  document.getElementById('finfo').textContent='📄 '+file.name+' ('+( file.size/1024).toFixed(1)+' KB)';
+  try{const t=await readFile(file);const out=document.getElementById('upOut');out.textContent=t;out.classList.add('vis');document.getElementById('upAct').style.display='flex';toast('File loaded');}
+  catch(e){toast('Error: '+e.message,1);}
+}
+async function tabAttach(event,targetId,cardId){
+  const file=event.target.files[0];if(!file)return;
+  try{const t=await readFile(file);document.getElementById(targetId).value=t;document.getElementById('aprev-'+cardId).style.display='flex';document.getElementById('aname-'+cardId).textContent=file.name;toast(file.name+' loaded');}
+  catch(e){toast('Error: '+e.message,1);}
+  event.target.value='';
+}
+function removeAttach(cardId,targetId){document.getElementById(targetId).value='';document.getElementById('aprev-'+cardId).style.display='none';}
+async function chatAttach(event){
+  const file=event.target.files[0];if(!file)return;
+  try{chatAText=await readFile(file);chatAName=file.name;document.getElementById('chatAprev').style.display='flex';document.getElementById('chatAname').textContent=file.name;toast(file.name+' attached');}
+  catch(e){toast('Error: '+e.message,1);}
+  event.target.value='';
+}
+function removeChatAttach(){chatAText='';chatAName='';document.getElementById('chatAprev').style.display='none';}
+
+// ── SUMMARY ──
+async function doSummary(){
+  const t=document.getElementById('sumIn').value.trim();
+  if(!t){toast('Add content first!',1);return;}
+  const card=document.getElementById('sumCard'),out=document.getElementById('sumOut');
+  card.style.display='block';out.innerHTML='<div class="loader"><span></span><span></span><span></span></div>';out.classList.add('vis');
+  try{
+    const chunk=t.length>5000?t.slice(0,4500)+'...'+t.slice(-300):t;
+    const r=await callAI('Summarize this document for a student.\n\nInclude:\n1. Main Topic\n2. Key Points (bullet list)\n3. Important Terms with definitions\n\nUse ONLY information from this document:\n\n'+chunk);
+    out.textContent=r;toast('Summary ready');
+  }catch(e){out.textContent='Error: '+e.message;toast(e.message,1);}
+}
+
+// ── FLASHCARDS ──
+async function doFlash(){
+  const t=document.getElementById('flIn').value.trim();
+  if(!t){toast('Add content first!',1);return;}
+  const sec=document.getElementById('flSec'),grid=document.getElementById('flGrid');
+  sec.style.display='block';grid.innerHTML='<div class="loader" style="padding:1.5rem;"><span></span><span></span><span></span></div>';
+  try{
+    const chunk=t.slice(0,4000);
+    const raw=await callAI('Create 6 flashcards from this document.\n\nUse EXACTLY this format:\nQ: question here\nA: answer here\n\nQ: question here\nA: answer here\n\nDocument:\n'+chunk+'\n\nWrite 6 flashcards:');
+    const cards=[];
+    const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l);
+    let curQ=null;
+    for(const line of lines){
+      if(/^Q\d*[:.]/i.test(line)){curQ=line.replace(/^Q\d*[:.]\s*/i,'').trim();}
+      else if(/^A\d*[:.]/i.test(line)&&curQ){const ans=line.replace(/^A\d*[:.]\s*/i,'').trim();if(curQ.length>3&&ans.length>1)cards.push({q:curQ,a:ans});curQ=null;}
+    }
+    if(cards.length===0){grid.innerHTML='<div style="color:var(--acc2);padding:1rem;">Could not generate flashcards. Try again.</div>';return;}
+    document.getElementById('flCount').textContent=cards.length+' Flashcards';
+    grid.innerHTML='';
+    cards.forEach((c,i)=>{
+      const el=document.createElement('div');el.className='fc';
+      el.innerHTML='<div class="fcq">Q'+(i+1)+': '+c.q+'</div><div class="fca">💡 '+c.a+'</div><div class="fch">Tap to reveal answer</div>';
+      el.onclick=()=>{el.classList.toggle('rev');el.querySelector('.fch').textContent=el.classList.contains('rev')?'Tap to hide':'Tap to reveal answer';};
+      grid.appendChild(el);
+    });
+    toast(cards.length+' flashcards created');
+  }catch(e){grid.innerHTML='<div style="color:var(--acc2);padding:1rem;">Error: '+e.message+'</div>';toast(e.message,1);}
+}
+function revAll(){document.querySelectorAll('.fc').forEach(c=>{c.classList.add('rev');c.querySelector('.fch').textContent='Tap to hide';});}
+
+// ── QUIZ ──
+async function doQuiz(){
+  const inputT=document.getElementById('qzIn').value.trim();
+  const t=inputT||lastQContent;
+  if(!t){toast('Add content first!',1);return;}
+  lastQContent=t;
+  const sec=document.getElementById('qzSec'),con=document.getElementById('qzCon');
+  sec.style.display='block';document.getElementById('qzRes').style.display='none';document.getElementById('qscore').style.display='none';
+  con.innerHTML='<div class="loader" style="padding:1.5rem;"><span></span><span></span><span></span></div>';
+  qAns=0;qOk=0;qTot=0;
+  try{
+    const raw=await callAI('Create 4 multiple choice quiz questions from this document.\n\nUse EXACTLY this format:\nQ: question\nA) option\nB) option\nC) option\nD) option\nCorrect: B\nExplanation: reason\n\nVary the correct answer between A, B, C, D.\n\nDocument:\n'+t.slice(0,4000)+'\n\nWrite 4 questions:');
+    const questions=[];
+    const blocks=raw.split(/\n(?=Q:)/i).filter(b=>b.trim());
+    for(const block of blocks){
+      const lines=block.split('\n').map(l=>l.trim()).filter(l=>l);
+      let question='',options=[],correct=-1,explanation='';
+      for(const line of lines){
+        if(/^Q[:\d.]/i.test(line))question=line.replace(/^Q[:\d.\s]*/i,'').trim();
+        else if(/^[A-D][).]/i.test(line))options.push(line);
+        else if(/^Correct[:.]/i.test(line)){const letter=line.replace(/^Correct[:.\\s]*/i,'').trim().toUpperCase().charAt(0);correct=['A','B','C','D'].indexOf(letter);}
+        else if(/^Explanation[:.]/i.test(line))explanation=line.replace(/^Explanation[:.\\s]*/i,'').trim();
+      }
+      if(question&&options.length>=2&&correct>=0){while(options.length<4)options.push(String.fromCharCode(65+options.length)+') -');questions.push({question,options,correct,explanation});}
+    }
+    if(questions.length===0){con.innerHTML='<div style="color:var(--acc2);padding:1rem;">Could not generate quiz. Try again.</div>';return;}
+    qTot=questions.length;con.innerHTML='';
+    document.getElementById('qscore').style.display='flex';updScore();
+    questions.forEach((q,qi)=>{
+      const el=document.createElement('div');el.className='qq';
+      const optsHTML=q.options.map((o,oi)=>'<button class="qo" onclick="ansQ(this,'+oi+','+q.correct+',\''+q.explanation.replace(/'/g,"\\'")+'\','+qi+')">'+o+'</button>').join('');
+      el.innerHTML='<div class="qqt">Q'+(qi+1)+': '+q.question+'</div><div class="qopts">'+optsHTML+'</div><div class="qfb" id="qfb-'+qi+'"></div>';
+      con.appendChild(el);
+    });
+    toast(questions.length+' questions ready');
+  }catch(e){con.innerHTML='<div style="color:var(--acc2);padding:1rem;">Error: '+e.message+'</div>';toast(e.message,1);}
+}
+function ansQ(btn,ch,ok,exp,qi){
+  btn.closest('.qopts').querySelectorAll('.qo').forEach(o=>o.disabled=true);
+  if(ch===ok){btn.classList.add('ok');qOk++;}else{btn.classList.add('ng');btn.closest('.qopts').querySelectorAll('.qo')[ok].classList.add('ok');}
+  document.getElementById('qfb-'+qi).textContent=(ch===ok?'Correct! ':'Wrong. ')+exp;
+  qAns++;updScore();
+  if(qAns===qTot){const pct=Math.round(qOk/qTot*100);document.getElementById('qzRes').style.display='block';document.getElementById('qzResT').textContent='Score: '+qOk+'/'+qTot+' ('+pct+'%) '+(pct>=80?'Excellent!':pct>=60?'Good job!':'Keep studying!');}
+}
+function updScore(){document.getElementById('qscore').textContent=qOk+'/'+qAns;}
+function retryQuiz(){qAns=0;qOk=0;qTot=0;document.getElementById('qzRes').style.display='none';document.getElementById('qzCon').innerHTML='';document.getElementById('qscore').style.display='none';if(lastQContent)doQuiz();else toast('Paste content first',1);}
+
+// ── STUDY PLAN ──
+async function doPlan(){
+  const t=document.getElementById('plIn').value.trim(),days=document.getElementById('pd').value;
+  if(!t){toast('Add content first!',1);return;}
+  const sec=document.getElementById('plSec'),con=document.getElementById('plCon');
+  sec.style.display='block';document.getElementById('plTitle').textContent=days+'-Day Study Plan';
+  con.innerHTML='<div class="loader" style="padding:1.5rem;"><span></span><span></span><span></span></div>';
+  try{
+    const raw=await callAI('Create a '+days+'-day study plan from this document.\n\nFormat:\nDay 1: Title\nDuration: X hours\nTasks:\n- task\n- task\n\nDay 2: ...\n\nDocument:\n'+t.slice(0,4000)+'\n\nWrite the plan:');
+    con.innerHTML='';
+    const dayBlocks=raw.split(/\n(?=Day\s*\d)/i).filter(b=>b.trim());
+    if(dayBlocks.length===0){con.innerHTML='<div style="color:var(--acc2);padding:1rem;">Could not generate plan. Try again.</div>';return;}
+    dayBlocks.forEach(block=>{
+      const lines=block.split('\n').map(l=>l.trim()).filter(l=>l);
+      const el=document.createElement('div');el.className='pd';
+      el.innerHTML='<div class="pdt">📅 '+lines[0]+'</div><div class="pdc">'+lines.slice(1).join('\n')+'</div>';
+      con.appendChild(el);
+    });
+    toast('Study plan ready');
+  }catch(e){con.innerHTML='<div style="color:var(--acc2);padding:1rem;">Error: '+e.message+'</div>';toast(e.message,1);}
+}
+
+// ── CHAT ──
+async function doChat(){
+  const inp=document.getElementById('chatIn'),msg=inp.value.trim();
+  if(!msg&&!chatAText){toast('Type a message!',1);return;}
+  if(!msg&&chatAText){toast('Type a question about the file!',1);return;}
+  inp.value='';inp.style.height='auto';
+  let fullMsg=msg,displayMsg=msg;
+  if(chatAText){fullMsg=msg+'\n\n--- File: '+chatAName+' ---\n'+chatAText.slice(0,3000);displayMsg='📎 '+chatAName+'\n'+msg;removeChatAttach();}
+  addMsg('user',displayMsg);chatHist.push({role:'user',content:fullMsg});
+  const lid=addMsg('ai','<div class="loader"><span></span><span></span><span></span></div>');
+  document.getElementById('cSend').disabled=true;
+  try{
+    const msgs=[{role:'system',content:'You are a helpful AI study tutor. Answer questions accurately and clearly. When given a document, base your answers only on that content.'},...chatHist];
+    const reply=await callAIStream(msgs,text=>{const el=document.getElementById(lid);if(el)el.querySelector('.mb').textContent=text;scChat();});
+    chatHist.push({role:'assistant',content:reply});
+  }catch(e){const el=document.getElementById(lid);if(el)el.querySelector('.mb').textContent='Error: '+e.message;}
+  document.getElementById('cSend').disabled=false;scChat();
+}
+function addMsg(role,html){
+  const id='m'+Date.now()+Math.random().toString(36).slice(2);
+  const d=document.createElement('div');d.className='msg '+role;d.id=id;
+  const av=document.createElement('div');av.className='mav';av.textContent=role==='user'?'👤':'🤖';
+  const mb=document.createElement('div');mb.className='mb';mb.innerHTML=html;
+  d.appendChild(av);d.appendChild(mb);
+  document.getElementById('chatMsgs').appendChild(d);scChat();return id;
+}
+function scChat(){const m=document.getElementById('chatMsgs');m.scrollTop=m.scrollHeight;}
+
+// ── UTILS ──
+function cpEl(id){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('Copied!'));}
+function toast(msg,err=0){const e=document.querySelector('.toast');if(e)e.remove();const t=document.createElement('div');t.className='toast';t.style.borderLeftColor=err?'var(--acc2)':'var(--acc3)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+</script>
+</body>
+</html>
